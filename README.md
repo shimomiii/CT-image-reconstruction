@@ -56,7 +56,7 @@ and using polar coordinates $(\tilde{x},\tilde{y})=(\tilde{s}\cos\theta, \tilde{
 
 $$
 H_{\mathrm{pri}}
- = 4\pi^2 \int d\theta \int d\tilde{s}\,
+ = 4\pi^2 \int d\theta \int d\tilde{s}
  (\beta\tilde{s}^2+h)|\tilde{s}||\tilde{\sigma}(\tilde{s},\theta)|^2.
 $$
 
