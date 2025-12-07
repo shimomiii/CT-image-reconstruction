@@ -69,7 +69,7 @@ void reconstruction_cpp(
     }
 }
 
-// ===== RNG helpers for Radon =====
+// ===== helpers for Radon =====
 
 static double rand_normal01(std::mt19937_64& gen) {
     static thread_local std::normal_distribution<double> dist(0.0, 1.0);
@@ -287,7 +287,7 @@ static void edges_and_centers(
     }
 }
 
-// free_energy の C++ 版（tau / s は前計算済みをもらう）
+// free_energy 
 static double free_energy_local_cpp(
     const double* tau_abs2,  // (Nk * Ntheta), row-major: k*Ntheta + j
     int Nk,
@@ -419,7 +419,7 @@ void n_section_search_cpp(
              rel_width(b_lo, b_hi) <= tol_rel &&
              rel_width(h_lo, h_hi) <= tol_rel);
         bool stop_fe = (fe_tol > 0.0) &&
-            (iter_best_E - best_E > -fe_tol);  // 改善が fe_tol 未満
+            (iter_best_E - best_E > -fe_tol);  
 
         if (stop_abs || stop_rel || stop_fe) {
             break;

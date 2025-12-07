@@ -1,160 +1,259 @@
-# Bayesian CT Reconstruction
+# Bayesian CT Reconstruction Framework
 
-This repository provides a complete computational framework for CT image reconstruction,  
-combining classical filtered backprojection (FBP) techniques with a Bayesian reconstruction
-method based on free-energy minimization. The pipeline supports:
-
-- Sinogram generation (C++ implementation)
-- Filtered backprojection reconstruction
-- Bayesian reconstruction (frequency-domain model)
-- Hyperparameter estimation (γ, β, h) via n-section search
-- Quantitative evaluation (PSNR, SSIM, profile comparison)
-
-The project is structured for high-resolution numerical experiments, including Shepp–Logan
-phantom reconstruction and noise/angle-reduction analysis.
+This repository provides a computational framework for CT image reconstruction,  
+combining classical Filtered Backprojection (FBP) with a Bayesian reconstruction method  
+based on a Markov Random Field (MRF) prior model.  
+A hybrid workflow of C++ (Radon transform, parameter estimation, reconstruction)  
+and Python (numerical experiments and evaluation) enables efficient reconstruction  
+even for high-resolution images.
 
 ---
 
-## 1. Repository Structure
+## 1. Theoretical Background (Bayesian Reconstruction and Free Energy)
+
+The Bayesian CT reconstruction method used in this project integrates  
+a Gaussian observation model with an MRF-based image prior.  
+This formulation yields a closed-form MAP estimator in the frequency domain.
+
+---
+
+### 1.1 Observation Model (Frequency Domain)
+
+Let σ(x,y) be the original image, and τ(s,θ) its Radon transform.  
+Assuming additive Gaussian noise, the observation model in frequency space is
+
+$$ \tilde{\tau}(\tilde{s},\theta) = \tilde{\sigma}(\tilde{s},\theta) + \tilde{n}(\tilde{s},\theta). $$
+
+The corresponding observation energy is
+
+$$
+H_{\mathrm{obs}}
+ = 4\pi^2 \gamma \int d\theta \int d\tilde{s}\,
+ |\tilde{\tau}-\tilde{\sigma}|^2,
+$$
+
+where γ is proportional to the inverse of the noise variance.
+
+---
+
+### 1.2 Prior Distribution (MRF Model)
+
+To impose smoothness and amplitude regularization,  
+the following prior energy is used:
+
+$$
+H_{\mathrm{pri}}(\sigma)
+ = \beta \iint |\nabla\sigma|^2 \, dxdy
+ + 4\pi h \iint |\sigma|^2 \, dxdy .
+$$
+
+In Fourier space,
+
+$$
+H_{\mathrm{pri}}
+ = 4\pi^2 \iint (\beta(\tilde{x}^2+\tilde{y}^2)+h)\,
+ |\tilde{\sigma}(\tilde{x},\tilde{y})|^2 \, d\tilde{x}d\tilde{y},
+$$
+
+and using polar coordinates $(\tilde{x},\tilde{y})=(\tilde{s}\cos\theta, \tilde{s}\sin\theta)$,
+
+$$
+H_{\mathrm{pri}}
+ = 4\pi^2 \int d\theta \int d\tilde{s}\,
+ (\beta\tilde{s}^2+h)\,|\tilde{s}|\,|\tilde{\sigma}(\tilde{s},\theta)|^2.
+$$
+
+The prior distribution is therefore
+
+$$
+p(\sigma\mid\beta,h)
+ \propto \exp\!\left[
+ -4\pi^2\!\iint(\beta\tilde{s}^2+h)\,|\tilde{s}|\,|\tilde{\sigma}|^2
+ \right].
+$$
+
+---
+
+### 1.3 MAP Estimator and Bayesian Filter (Closed-form Solution)
+
+The posterior distribution is
+
+$$
+p(\sigma\mid\tau,\gamma,\beta,h)
+ \propto \exp\!\left[
+ -4\pi^2\!\int\!\!\int
+ \left(
+   \gamma|\tilde{\tau}-\tilde{\sigma}|^2
+   +(\beta\tilde{s}^2+h)|\tilde{s}|\,|\tilde{\sigma}|^2
+ \right)
+ \right].
+$$
+
+Define
+
+$$
+F_{\tilde{s}}
+ = (\beta\tilde{s}^2+h)|\tilde{s}|+\gamma.
+$$
+
+Then the MAP estimate has the closed-form solution
+
+$$
+\hat{\sigma}(\tilde{s},\theta)
+ = \frac{\gamma}{F_{\tilde{s}}} \, \tilde{\tau}(\tilde{s},\theta).
+$$
+
+Here, γ/F_{\tilde{s}} acts as a **Bayesian frequency-domain filter**,  
+which generalizes the classical FBP filters.
+
+---
+
+### 1.4 Hyperparameter Estimation (Free Energy Minimization)
+
+The hyperparameters (γ, β, h) are obtained by minimizing the free energy
+
+$$
+\mathcal{F}(\gamma,\beta,h)
+ = -\log\,p(\tau\mid\gamma,\beta,h),
+$$
+
+where the marginal likelihood is
+
+$$
+p(\tau\mid\gamma,\beta,h)
+ = \int p(\tau\mid\sigma,\gamma)\,p(\sigma\mid\beta,h)\,d\sigma .
+$$
+
+After discretization, the free energy becomes
+
+$$
+F(\gamma,\beta,h) = -\frac{1}{2} \sum_{\tilde{k},l} \left[ \log\!\left( \frac{8\pi\Delta_\theta\Delta_s}{N_s}\, \gamma\left(1-\frac{\gamma}{F_{\tilde{s}}}\right) \right) - \frac{8\pi^2\Delta_\theta\Delta_s}{N_s}\, \gamma\left(1-\frac{\gamma}{F_{\tilde{s}}}\right) \tilde{\tau}_{\tilde{k},l}|^2 \right].
+$$
+
+This free energy is minimized using a **multi-dimensional grid search**,  
+providing a consistent Bayesian estimation pipeline.
+
+---
+
+## 2. Repository Structure
+
 ```
 .
-├── bayesian_ct_recon.ipynb # Main notebook for experiments and analysis
-├── recon.cpp # C++ implementation (Radon transform & backprojection)
-├── librecon_cpp.dylib # Compiled shared library for macOS
-│
-├── sinograms/ # Generated sinogram data (ignored by Git)
-│ └── ... (CSV/NPY files)
-│
-├── results/ # Reconstruction results, figures, logs (ignored by Git)
-│ └── ... (images, metrics)
-│
+├── bayesian_ct_recon.ipynb      # Main experiment notebook  
+├── recon.cpp                     # C++ Radon transform / backprojection  
+├── librecon_cpp.dylib            # Shared library (macOS)  
+├── sinograms/                    # Generated sinograms  
+├── results/                      # Reconstruction results  
 └── README.md
 ```
 
 ---
 
-## 2. Features
+## 3. Features
 
-### Sinogram Generation
-- Radon transform implemented in C++
-- Supports:
-  - Normal noise
-  - Poisson noise
-  - Delta (noise-free) mode
-- Adjustable:
-  - Number of projection angles (`N_theta`)
-  - Detector sampling (`N_s`)
-  - Number of backprojection steps (`nh`)
-  - Noise standard deviation (`psd`)
-  - Angular reduction factor (`T`) for sparse-view CT
+### 3.1 Sinogram Generation
+- High-speed Radon transform in C++  
+- Noise models: normal, poisson, delta  
+- Adjustable parameters: psd, Ns, Nθ, T (sparse-view CT)
 
-### Reconstruction
-- **Filtered Backprojection (FBP)**  
-  Reconstruction using standard filters: Ramp, Hann, Hamming, Shepp–Logan.
+### 3.2 Reconstruction
+**FBP Filters**
+- Ramp  
+- Shepp–Logan  
+- Hann  
+- Hamming  
 
-- **Bayesian Reconstruction**  
-  - Frequency-domain model  
-  - Free-energy minimization  
-  - Hyperparameters (γ, β, h) estimated via n-section search  
-  - C++ and Python hybrid pipeline
+**Bayesian Reconstruction**
+- Closed-form MAP estimator  
+- Hyperparameter estimation via free-energy minimization  
+- Hybrid Python + C++ implementation
 
-### Evaluation
-- PSNR / SSIM computation
-- Reconstruction profiles
-- Noise sensitivity analysis
-- Angular subsampling (T-variation) performance
+### 3.3 Evaluation Metrics
+- PSNR, SSIM, RMSE  
+- Visual evaluation  
+- Profile comparison  
 
 ---
 
-## 3. Build Instructions (macOS)
-
-Compile the C++ reconstruction library:
+## 4. Building the C++ Library (macOS)
 
 ```
 clang++ -std=c++17 -O3 -dynamiclib -o librecon_cpp.dylib recon.cpp
 ```
 
-This produces `librecon_cpp.dylib`, which is loaded from Python via `ctypes`.
-
 ---
 
-## 4. Python Usage
+## 5. Using the Library from Python
 
-### Load the shared library
-
-```python
+```
 import ctypes
-
 lib = ctypes.CDLL("./librecon_cpp.dylib")
-
 ```
+
 Example: calling the backprojection function
+
 ```
-
-import numpy as np
-
-ny = nx = 256
 out = np.zeros((ny, nx), dtype=np.float64)
-
 lib.reconstruction_cpp(
     ny, nx,
-    left, right,
-    top, bottom,
-    sinogram.ctypes.data_as(ctypes.POINTER(ctypes.c_double)),
-    N_theta, N_s, ds,
-    out.ctypes.data_as(ctypes.POINTER(ctypes.c_double)),
+    left, right, top, bottom,
+    sino.ctypes.data_as(...),
+    Nθ, Ns, ds,
+    out.ctypes.data_as(...)
 )
-
-```
-More complete examples are available in `bayesian_ct_recon.ipynb`.
-
----
-
-## 5. Running the Full Pipeline
-
-1. **Generate sinograms**  
-   (via the notebook or your Python script)
-
-2. **Choose reconstruction method**
-   - FBP with various filters
-   - Bayesian reconstruction
-
-3. **Evaluate**
-   - PSNR / SSIM
-   - Visual comparison
-   - Profile analysis
-
-4. **Save results**  
-   Output files are stored under `./results/`.
-
----
-
-## 6. Requirements
 ```
 
-python >= 3.9
-numpy
-scipy
-matplotlib
-tqdm
+---
+
+## 6. Numerical Experiment Pipeline
 
 ```
-macOS (ARM or Intel) is supported for the C++ dynamic library.
+records = numerical_experiment(
+    psd_range=(0.5,4.0,0.5),
+    N_sizes=256,
+    N_theta=256,
+    T_range=(1.0,10.5,1.0),
+    filters=("bayes","ramp","shepp-logan","hann","hamming"),
+    phantom=phantom,
+    radon_transform_fn=radon_transform_cxx,
+    free_energy_fn=free_energy,
+    n_section_search_fn=n_section_search_cxx,
+    image_reconstruction_fn=image_reconstruction,
+)
+```
+
+### Runtime Example
+- 256×256, 180 projections: **~0.7 seconds per reconstruction**  
+- 2048×2048, 1800 projections: **~16 seconds per reconstruction**
 
 ---
 
-## 7. License
+## 7. Requirements
 
-Specify your preferred license (e.g., MIT, Apache 2.0).
+```
+python >= 3.9  
+numpy  
+scipy  
+matplotlib  
+pandas  
+tqdm  
+scikit-image
+```
 
 ---
 
-## 8. Acknowledgements
+## 8. References
 
-This repository uses:
+1. A. C. Kak and M. Slaney,  
+   *Principles of Computerized Tomographic Imaging*,  
+   IEEE Press, 1988.
 
-- Shepp–Logan phantom  
-- Custom Radon & backprojection implementation in C++  
-- Bayesian CT techniques inspired by Shouno et al. and related literature  
+2. G. N. Ramachandran and A. V. Lakshminarayanan,  
+   “Three-dimensional reconstruction from radiographs and electron micrographs:  
+   Application of convolutions instead of Fourier transforms,”  
+   *PNAS*, vol. 68, no. 9, pp. 2236–2240, 1971.
 
-If you use this work in an academic project, please cite appropriately.# CT-image-reconstruction
+3. H. Shouno and M. Okada,  
+   “Bayesian Image Restoration for Medical Images Using Radon Transform,”  
+   *Journal of the Physical Society of Japan*, vol. 79, no. 7, p. 074004, 2010.
+
