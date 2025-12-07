@@ -24,7 +24,7 @@ $$ \tilde{\tau}(\tilde{s},\theta) = \tilde{\sigma}(\tilde{s},\theta) + \tilde{n}
 
 $$
 H_{\mathrm{obs}}
- = 4\pi^2 \gamma \int d\theta \int d\tilde{s}\,
+ = 4\pi^2 \gamma \int d\theta \int d\tilde{s}
  \left|\tilde{\tau} - \tilde{\sigma}\right|^2
 $$
 
@@ -37,7 +37,7 @@ $$
 画像の滑らかさと振幅抑制を課すため，事前エネルギーを
 
 $$
-H_{\mathrm{pri}}(\sigma) = \beta \!\iint |\nabla\sigma|^2\,dxdy + 4\pi h \!\iint |\sigma|^2\,dxdy
+H_{\mathrm{pri}}(\sigma) = \beta \!\iint |\nabla\sigma|^2 dxdy + 4\pi h \iint |\sigma|^2 dxdy
 $$
 
 と定義する．  
@@ -45,16 +45,16 @@ $$
 
 $$
 H_{\mathrm{pri}}
- = 4\pi^2 \!\iint (\beta(\tilde{x}^2+\tilde{y}^2)+h)\,
- |\tilde{\sigma}(\tilde{x},\tilde{y})|^2\,d\tilde{x}d\tilde{y}
+ = 4\pi^2  \iint (\beta(\tilde{x}^2+\tilde{y}^2)+h) 
+ |\tilde{\sigma}(\tilde{x},\tilde{y})|^2 d\tilde{x}d\tilde{y}
 $$
 
 となり，極座標 $\tilde{x}=\tilde{s}\cos\theta$, $\tilde{y}=\tilde{s}\sin\theta$ に変換すると
 
 $$
 H_{\mathrm{pri}}
- = 4\pi^2 \int d\theta \int d\tilde{s}\,
- (\beta\tilde{s}^2+h)\,|\tilde{s}|\,|\tilde{\sigma}(\tilde{s},\theta)|^2
+ = 4\pi^2 \int d\theta \int d\tilde{s}
+ (\beta\tilde{s}^2+h) |\tilde{s}| |\tilde{\sigma}(\tilde{s},\theta)|^2
 $$
 
 となる．  
@@ -62,8 +62,8 @@ $$
 
 $$
 p(\sigma\mid\beta,h)
- \propto \exp\!\left[-4\pi^2\!\int\!\!\int
-   (\beta\tilde{s}^2+h)\,|\tilde{s}|\,|\tilde{\sigma}|^2
+ \propto \exp \left[-4\pi^2 \int \int
+   (\beta\tilde{s}^2+h)\,|\tilde{s}| |\tilde{\sigma}|^2
  \right]
 $$
 
@@ -78,11 +78,11 @@ $$
 $$
 p(\sigma\mid\tau,\gamma,\beta,h)
 \propto
-\exp\!\left[
- -4\pi^2\!\int\!\!\int
+\exp \left[
+ -4\pi^2 \int \int
  \Big(
    \gamma|\tilde{\tau}-\tilde{\sigma}|^2
-   +(\beta\tilde{s}^2+h)|\tilde{s}|\,|\tilde{\sigma}|^2
+   +(\beta\tilde{s}^2+h)|\tilde{s}| |\tilde{\sigma}|^2
  \Big)
 \right]
 $$
@@ -99,7 +99,7 @@ $$
 
 $$
 \hat{\sigma}(\tilde{s},\theta)
- = \frac{\gamma}{F_{\tilde{s}}}\,\tilde{\tau}(\tilde{s},\theta)
+ = \frac{\gamma}{F_{\tilde{s}}} \tilde{\tau}(\tilde{s},\theta)
 $$
 
 となる．  
@@ -113,14 +113,14 @@ $$
 
 $$
 p(\tau\mid\gamma,\beta,h)
- = \int p(\tau\mid\sigma,\gamma)\,p(\sigma\mid\beta,h)\,d\sigma
+ = \int p(\tau\mid\sigma,\gamma)\,p(\sigma\mid\beta,h) d\sigma
 $$
 
 から定義される **自由エネルギー**
 
 $$
 \mathcal{F}(\gamma,\beta,h)
- = -\log\,p(\tau\mid\gamma,\beta,h)
+ = -\log p(\tau\mid\gamma,\beta,h)
 $$
 
 を最小化することで求められる．  
@@ -128,7 +128,7 @@ $$
 離散化後の自由エネルギーは次の形に整理できる：
 
 $$
-F(\gamma,\beta,h) = -\frac{1}{2} \sum_{\tilde{k},l} \left[ \log\left( \frac{8\pi\Delta_\theta\Delta_s}{N_s}\, \gamma\left(1-\frac{\gamma}{F_{\tilde{s}}}\right) \right) - \frac{8\pi^2\Delta_\theta\Delta_s}{N_s}\, \gamma\left(1-\frac{\gamma}{F_{\tilde{s}}}\right) |\tilde{\tau}_{\tilde{k},l}|^2 \right]
+F(\gamma,\beta,h) = -\frac{1}{2} \sum_{\tilde{k},l} \left[ \log\left( \frac{8\pi\Delta_\theta\Delta_s}{N_s} \gamma\left(1-\frac{\gamma}{F_{\tilde{s}}}\right) \right) - \frac{8\pi^2\Delta_\theta\Delta_s}{N_s} \gamma\left(1-\frac{\gamma}{F_{\tilde{s}}}\right) |\tilde{\tau}_{\tilde{k},l}|^2 \right]
 $$
 
 この自由エネルギーを最小化することで  

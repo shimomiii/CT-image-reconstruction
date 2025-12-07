@@ -27,7 +27,7 @@ $$ \tilde{\tau}(\tilde{s},\theta) = \tilde{\sigma}(\tilde{s},\theta) + \tilde{n}
 The corresponding observation energy is
 
 $$
-H_{\mathrm{obs}} = 4\pi^2 \gamma \int d\theta \int d\tilde{s}\,
+H_{\mathrm{obs}} = 4\pi^2 \gamma \int d\theta \int d\tilde{s}
  |\tilde{\tau}-\tilde{\sigma}|^2,
 $$
 
@@ -41,15 +41,15 @@ To impose smoothness and amplitude regularization,
 the following prior energy is used:
 
 $$
-H_{\mathrm{pri}}(\sigma) = \beta \iint |\nabla\sigma|^2 \, dxdy + 4\pi h \iint |\sigma|^2 \, dxdy .
+H_{\mathrm{pri}}(\sigma) = \beta \iint |\nabla\sigma|^2  dxdy + 4\pi h \iint |\sigma|^2  dxdy .
 $$
 
 In Fourier space,
 
 $$
 H_{\mathrm{pri}}
- = 4\pi^2 \iint (\beta(\tilde{x}^2+\tilde{y}^2)+h)\,
- |\tilde{\sigma}(\tilde{x},\tilde{y})|^2 \, d\tilde{x}d\tilde{y},
+ = 4\pi^2 \iint (\beta(\tilde{x}^2+\tilde{y}^2)+h)
+ |\tilde{\sigma}(\tilde{x},\tilde{y})|^2  d\tilde{x}d\tilde{y},
 $$
 
 and using polar coordinates $(\tilde{x},\tilde{y})=(\tilde{s}\cos\theta, \tilde{s}\sin\theta)$,
@@ -57,15 +57,15 @@ and using polar coordinates $(\tilde{x},\tilde{y})=(\tilde{s}\cos\theta, \tilde{
 $$
 H_{\mathrm{pri}}
  = 4\pi^2 \int d\theta \int d\tilde{s}\,
- (\beta\tilde{s}^2+h)\,|\tilde{s}|\,|\tilde{\sigma}(\tilde{s},\theta)|^2.
+ (\beta\tilde{s}^2+h)|\tilde{s}||\tilde{\sigma}(\tilde{s},\theta)|^2.
 $$
 
 The prior distribution is therefore
 
 $$
 p(\sigma\mid\beta,h)
- \propto \exp\!\left[
- -4\pi^2\!\iint(\beta\tilde{s}^2+h)\,|\tilde{s}|\,|\tilde{\sigma}|^2
+ \propto \exp\left[
+ -4\pi^2\\iint(\beta\tilde{s}^2+h)|\tilde{s}||\tilde{\sigma}|^2
  \right].
 $$
 
@@ -77,11 +77,11 @@ The posterior distribution is
 
 $$
 p(\sigma\mid\tau,\gamma,\beta,h)
- \propto \exp\!\left[
- -4\pi^2\!\int\!\!\int
+ \propto \exp \left[
+ -4\pi^2\int\int
  \left(
    \gamma|\tilde{\tau}-\tilde{\sigma}|^2
-   +(\beta\tilde{s}^2+h)|\tilde{s}|\,|\tilde{\sigma}|^2
+   +(\beta\tilde{s}^2+h)|\tilde{s}||\tilde{\sigma}|^2
  \right)
  \right].
 $$
@@ -97,7 +97,7 @@ Then the MAP estimate has the closed-form solution
 
 $$
 \hat{\sigma}(\tilde{s},\theta)
- = \frac{\gamma}{F_{\tilde{s}}} \, \tilde{\tau}(\tilde{s},\theta).
+ = \frac{\gamma}{F_{\tilde{s}}} \tilde{\tau}(\tilde{s},\theta).
 $$
 
 Here, γ/F_{\tilde{s}} acts as a **Bayesian frequency-domain filter**,  
@@ -111,20 +111,20 @@ The hyperparameters (γ, β, h) are obtained by minimizing the free energy
 
 $$
 \mathcal{F}(\gamma,\beta,h)
- = -\log\,p(\tau\mid\gamma,\beta,h),
+ = -\log p(\tau\mid\gamma,\beta,h),
 $$
 
 where the marginal likelihood is
 
 $$
 p(\tau\mid\gamma,\beta,h)
- = \int p(\tau\mid\sigma,\gamma)\,p(\sigma\mid\beta,h)\,d\sigma .
+ = \int p(\tau\mid\sigma,\gamma) p(\sigma\mid\beta,h) d\sigma .
 $$
 
 After discretization, the free energy becomes
 
 $$
-F(\gamma,\beta,h) = -\frac{1}{2} \sum_{\tilde{k},l} \left[ \log\!\left( \frac{8\pi\Delta_\theta\Delta_s}{N_s}\, \gamma\left(1-\frac{\gamma}{F_{\tilde{s}}}\right) \right) - \frac{8\pi^2\Delta_\theta\Delta_s}{N_s}\, \gamma\left(1-\frac{\gamma}{F_{\tilde{s}}}\right) \tilde{\tau}_{\tilde{k},l}|^2 \right].
+F(\gamma,\beta,h) = -\frac{1}{2} \sum_{\tilde{k},l} \left[ \log\left( \frac{8\pi\Delta_\theta\Delta_s}{N_s} \gamma\left(1-\frac{\gamma}{F_{\tilde{s}}}\right) \right) - \frac{8\pi^2\Delta_\theta\Delta_s}{N_s} \gamma\left(1-\frac{\gamma}{F_{\tilde{s}}}\right) \tilde{\tau}_{\tilde{k},l}|^2 \right].
 $$
 
 This free energy is minimized using a **multi-dimensional grid search**,  
