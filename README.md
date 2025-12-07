@@ -27,8 +27,7 @@ $$ \tilde{\tau}(\tilde{s},\theta) = \tilde{\sigma}(\tilde{s},\theta) + \tilde{n}
 The corresponding observation energy is
 
 $$
-H_{\mathrm{obs}}
- = 4\pi^2 \gamma \int d\theta \int d\tilde{s}\,
+H_{\mathrm{obs}} = 4\pi^2 \gamma \int d\theta \int d\tilde{s}\,
  |\tilde{\tau}-\tilde{\sigma}|^2,
 $$
 
@@ -42,9 +41,7 @@ To impose smoothness and amplitude regularization,
 the following prior energy is used:
 
 $$
-H_{\mathrm{pri}}(\sigma)
- = \beta \iint |\nabla\sigma|^2 \, dxdy
- + 4\pi h \iint |\sigma|^2 \, dxdy .
+H_{\mathrm{pri}}(\sigma) = \beta \iint |\nabla\sigma|^2 \, dxdy + 4\pi h \iint |\sigma|^2 \, dxdy .
 $$
 
 In Fourier space,
